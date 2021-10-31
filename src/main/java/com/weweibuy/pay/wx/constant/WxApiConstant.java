@@ -11,6 +11,11 @@ import org.springframework.http.HttpHeaders;
 public interface WxApiConstant {
 
     /**
+     * 微信商户支付 Host
+     */
+    String WX_MCH_PAY_HOST = "api.mch.weixin.qq.com";
+
+    /**
      * 签名方法
      */
     String WX_SIGN_METHOD = "SHA256withRSA";

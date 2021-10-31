@@ -3,6 +3,8 @@ package com.weweibuy.pay.wx.config;
 import com.weweibuy.framework.common.core.concurrent.LogExceptionThreadFactory;
 import com.weweibuy.framework.common.core.support.AlarmService;
 import com.weweibuy.framework.common.core.utils.DateTimeUtils;
+import com.weweibuy.framework.common.core.utils.IdWorker;
+import com.weweibuy.framework.common.log.support.LogTraceContext;
 import com.weweibuy.pay.wx.config.properties.WxAppProperties;
 import com.weweibuy.pay.wx.manager.PlatformCertificateManager;
 import lombok.RequiredArgsConstructor;
@@ -44,11 +46,16 @@ public class ScheduledRefreshConfig implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        // 加载证书
+        platformCertificateManager.reloadPlatformCertificate();
+        // 检查商户证书
+        checkMerchantCertificate();
         // 每天凌晨 00:10 刷新平台证书
         schedule.scheduleAtFixedRate(() -> checkCertificate(),
                 delay(), 24 * 60, TimeUnit.MINUTES);
     }
 
+    //  delay 凌晨 00:10
     private long delay() {
         LocalDate localDate = LocalDate.now().plusDays(1);
         LocalTime localTime = LocalTime.of(0, 10);
@@ -65,11 +72,16 @@ public class ScheduledRefreshConfig implements InitializingBean {
         }
     }
 
-    public void checkCertificate() {
-        log.info("检查证书任务启动");
-        reloadPlatformCertificate();
-        checkMerchantCertificate();
-        log.info("检查证书任务完成");
+    private void checkCertificate() {
+        try {
+            LogTraceContext.setTraceCode(IdWorker.nextStringId());
+            log.info("检查证书任务启动");
+            reloadPlatformCertificate();
+            checkMerchantCertificate();
+            log.info("检查证书任务完成");
+        } finally {
+            LogTraceContext.clear();
+        }
     }
 
     /**

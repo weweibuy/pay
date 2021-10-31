@@ -3,7 +3,6 @@ package com.weweibuy.pay.wx.manager;
 import com.weweibuy.pay.wx.support.PlatformCertificateStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import java.security.cert.X509Certificate;
@@ -18,7 +17,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PlatformCertificateManager implements InitializingBean {
+public class PlatformCertificateManager {
 
     private final PlatformCertificateStore platformCertificateStore;
 
@@ -43,8 +42,4 @@ public class PlatformCertificateManager implements InitializingBean {
     }
 
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        reloadPlatformCertificate();
-    }
 }

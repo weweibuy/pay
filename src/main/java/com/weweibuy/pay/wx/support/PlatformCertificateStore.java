@@ -11,7 +11,6 @@ import com.weweibuy.pay.wx.constant.CertificateCacheConstant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,13 +31,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = CertificateCacheConstant.PLATFORM_CERTIFICATE_CACHE_NAME)
-public class PlatformCertificateStore implements InitializingBean {
+public class PlatformCertificateStore {
 
     private final WxAppProperties wxAppProperties;
 
     private final ApplicationContext applicationContext;
-
-    private DownloadCertificateClient downloadCertificateClient;
 
     private final AlarmService alarmService;
 
@@ -47,6 +44,8 @@ public class PlatformCertificateStore implements InitializingBean {
 
     @Cacheable(key = "'fetchPlatformCertificate'")
     public Map<String, X509Certificate> fetchPlatformCertificate() {
+        DownloadCertificateClient downloadCertificateClient = applicationContext.getBean(DownloadCertificateClient.class);
+
         DownloadCertificateRespDTO downloadCertificateRespDTO = downloadCertificateClient.downloadCertificate();
         Map<String, X509Certificate> stringX509CertificateMap = CertificatesHelper.platformCertificate(downloadCertificateRespDTO, wxAppProperties);
         if (MapUtils.isEmpty(stringX509CertificateMap)) {
@@ -60,12 +59,6 @@ public class PlatformCertificateStore implements InitializingBean {
     @CacheEvict(allEntries = true)
     public void evict() {
         log.info("失效平台证书缓存成功");
-    }
-
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        downloadCertificateClient = applicationContext.getBean(DownloadCertificateClient.class);
     }
 
 

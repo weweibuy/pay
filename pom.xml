@@ -33,10 +33,10 @@
             <artifactId>common-core</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.weweibuy.framework</groupId>
-            <artifactId>common-db</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.weweibuy.framework</groupId>-->
+            <!--<artifactId>common-db</artifactId>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>com.weweibuy.framework</groupId>

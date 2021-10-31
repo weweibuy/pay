@@ -9,5 +9,5 @@ wx:
     api-key: 12345678901234567890123456789012
     private-key-info:
       - serial-no: 123213
-        private-key-path: test.pem
+        private-key-path: classpath:private_key_pkcs.pem
         expire-time: 2021-12-12 00:00:00

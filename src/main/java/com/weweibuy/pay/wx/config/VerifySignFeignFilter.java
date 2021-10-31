@@ -56,13 +56,13 @@ public class VerifySignFeignFilter implements FeignFilter {
     @Override
     public Response filter(Request request, Request.Options options, FeignFilterChain chain) throws IOException {
         // 增加签名请求头
-        addSingHeader(request);
+        request = addSingHeader(request);
         Response response = chain.doFilter(request, options);
         return verifySign(response, request);
     }
 
 
-    private void addSingHeader(Request request) {
+    private Request addSingHeader(Request request) {
         String authorization = null;
         try {
             authorization = SignAndVerifySignUtils.authorization(request, wxAppProperties);
@@ -72,16 +72,17 @@ public class VerifySignFeignFilter implements FeignFilter {
                             request.httpMethod(),
                             request.url(),
                             e.getMessage(),
-                            LogTraceContext.getTraceCode().orElse("")));
+                            LogTraceContext.getTraceCodeOrEmpty()));
             throw Exceptions.business("请求微信签名失败", e);
         } catch (InvalidKeyException e) {
             alarmService.sendAlarm(ALARM_BIZ_TYPE,
                     String.format("请求微信: 商户签名证书无效: %s, trace: %s",
                             e.getMessage(),
-                            LogTraceContext.getTraceCode().orElse("")));
+                            LogTraceContext.getTraceCodeOrEmpty()));
             throw Exceptions.business("请求微信签名证书无效", e);
         }
-        request.headers().put(WxApiConstant.AUTHORIZATION_HEADER, Collections.singleton(authorization));
+        request.requestTemplate().header(WxApiConstant.AUTHORIZATION_HEADER, Collections.singleton(authorization));
+        return request.requestTemplate().request();
     }
 
     /**
@@ -97,6 +98,17 @@ public class VerifySignFeignFilter implements FeignFilter {
         if (response == null || isDownLoadBillUrl(request)) {
             return response;
         }
+        int status = response.status();
+        if (status == 401) {
+            alarmService.sendAlarmFormatMsg(ALARM_BIZ_TYPE, "请求微信: %s %s, 签名错误, trace: %s",
+                    request.httpMethod(), request.url(), LogTraceContext.getTraceCodeOrEmpty());
+            return response;
+        }
+
+        if (status < 200 || status >= 300) {
+            return response;
+        }
+
         // 响应头
         WxResponseHeader wxResponseHeader = WxResponseHeader.fromWxResponse(response);
         verifyResponseHeader(wxResponseHeader);
@@ -136,7 +148,7 @@ public class VerifySignFeignFilter implements FeignFilter {
         if (x509Certificate == null) {
             alarmService.sendAlarm(ALARM_BIZ_TYPE,
                     String.format("下载平台证书时, 无法找到平台签名证书, trace: %s",
-                            LogTraceContext.getTraceCode().orElse("")));
+                            LogTraceContext.getTraceCodeOrEmpty()));
             throw Exceptions.business("下载平台证书时, 无法找到平台签名证书");
         }
 
@@ -172,7 +184,7 @@ public class VerifySignFeignFilter implements FeignFilter {
                         String.format("请求微信: %s %s , 响应验签, 验签失败, trace: %s",
                                 request.httpMethod(),
                                 request.url(),
-                                LogTraceContext.getTraceCode().orElse("")));
+                                LogTraceContext.getTraceCodeOrEmpty()));
                 throw Exceptions.business("微信响应验签,验签失败");
             }
         } catch (SignatureException e) {
@@ -181,7 +193,7 @@ public class VerifySignFeignFilter implements FeignFilter {
                             request.httpMethod(),
                             request.url(),
                             e.getMessage(),
-                            LogTraceContext.getTraceCode().orElse("")));
+                            LogTraceContext.getTraceCodeOrEmpty()));
             throw Exceptions.business("微信响应验签, 生成签名失败", e);
         } catch (InvalidKeyException e) {
             alarmService.sendAlarm(ALARM_BIZ_TYPE,
@@ -189,7 +201,7 @@ public class VerifySignFeignFilter implements FeignFilter {
                             request.httpMethod(),
                             request.url(),
                             e.getMessage(),
-                            LogTraceContext.getTraceCode().orElse("")));
+                            LogTraceContext.getTraceCodeOrEmpty()));
             throw Exceptions.business("微信响应验签, 微信平台证书无效", e);
         }
     }

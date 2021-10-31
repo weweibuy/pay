@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import javax.crypto.SecretKey;
@@ -14,6 +15,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -33,7 +35,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Data
 @ConfigurationProperties(prefix = "wx.pay")
-public class WxAppProperties {
+public class WxAppProperties implements InitializingBean {
 
     /**
      * 商户号
@@ -85,6 +87,13 @@ public class WxAppProperties {
 
         /**
          * 证书路径地址
+         * <p>
+         * <p>
+         * eg: classpath:db-encrypt.pem  or
+         * <p>
+         * db-encrypt.pem 项目路径
+         * or
+         * /db-encrypt.pem  绝对路径
          */
         @NotBlank(message = "证书路径地址不能为空")
         private String privateKeyPath;
@@ -117,6 +126,11 @@ public class WxAppProperties {
 
     }
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        initApiSecretKey();
+        initPrivateKey();
+    }
 
     private void initApiSecretKey() {
         apiSecretKey = new SecretKeySpec(apiKey.getBytes(), "AES");
@@ -151,6 +165,18 @@ public class WxAppProperties {
         }
 
         String privateKeyPath = serialNoPrivateKeyInfo.getPrivateKeyPath();
+        String cl = "classpath:";
+        if (privateKeyPath.startsWith(cl)) {
+            File classPathFile = new File(WxAppProperties.class.getResource("/").getPath());
+            String classPath = null;
+            try {
+                classPath = classPathFile.getCanonicalPath();
+            } catch (IOException e) {
+                throw Exceptions.uncheckedIO(e);
+            }
+            privateKeyPath = classPath + File.separator + privateKeyPath.substring(cl.length(), privateKeyPath.length());
+        }
+
         try (FileInputStream fileInputStream = new FileInputStream(privateKeyPath)) {
             PrivateKey privateKey = SignAndVerifySignUtils.loadPrivateKey(fileInputStream);
             SerialNoPrivateKey serialNoPrivateKey = new SerialNoPrivateKey();

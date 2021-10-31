@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import java.security.InvalidKeyException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
+import java.util.Optional;
 
 /**
  * 微信支付请求 签名字段
@@ -55,7 +56,7 @@ public class WxRequestSign {
                 .requestUri(SignAndVerifySignUtils.generateSignUri(request.url()))
                 .timestampSecond(DateTimeUtils.currentTimeSeconds())
                 .nonce(SignAndVerifySignUtils.generateNonceStr())
-                .body(new String(request.body()))
+                .body(Optional.ofNullable(request.body()).map(String::new).orElse(""))
                 .build();
     }
 
