@@ -1,7 +1,7 @@
 package com.weweibuy.pay.wx.support;
 
 import com.weweibuy.pay.wx.client.dto.resp.DownloadCertificateRespDTO;
-import com.weweibuy.pay.wx.config.WxAppProperties;
+import com.weweibuy.pay.wx.config.properties.WxAppProperties;
 import com.weweibuy.pay.wx.model.vo.SerialNoCertificate;
 import com.weweibuy.framework.common.codec.aes.Aes256GcmUtils;
 import lombok.extern.slf4j.Slf4j;

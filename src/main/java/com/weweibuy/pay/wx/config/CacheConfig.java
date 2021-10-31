@@ -18,12 +18,12 @@ import java.util.concurrent.TimeUnit;
 public class CacheConfig {
 
     /**
-     *
      * @return
      */
     @Bean
     public CacheManager caffeineCacheManager() {
-        return buildCacheManager(100, 2000, 1, TimeUnit.DAYS);
+        CaffeineCacheManager caffeineCacheManager = buildCacheManager(100, 2000, 1, TimeUnit.DAYS);
+        return caffeineCacheManager;
     }
 
 
@@ -36,7 +36,6 @@ public class CacheConfig {
         cacheManager.setCaffeine(caffeine);
         return cacheManager;
     }
-
 
 
 }

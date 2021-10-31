@@ -2,6 +2,7 @@ package com.weweibuy.pay.wx.config;
 
 import com.weweibuy.pay.wx.client.dto.resp.DownloadCertificateRespDTO;
 import com.weweibuy.pay.wx.client.dto.resp.WxResponseHeader;
+import com.weweibuy.pay.wx.config.properties.WxAppProperties;
 import com.weweibuy.pay.wx.constant.WxApiConstant;
 import com.weweibuy.pay.wx.manager.PlatformCertificateManager;
 import com.weweibuy.pay.wx.support.CertificatesHelper;

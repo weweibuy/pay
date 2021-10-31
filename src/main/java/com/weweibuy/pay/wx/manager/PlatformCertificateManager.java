@@ -2,6 +2,8 @@ package com.weweibuy.pay.wx.manager;
 
 import com.weweibuy.pay.wx.support.PlatformCertificateStore;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import java.security.cert.X509Certificate;
@@ -13,9 +15,10 @@ import java.util.Map;
  * @author durenhao
  * @date 2021/10/31 13:56
  **/
+@Slf4j
 @Component
 @RequiredArgsConstructor
-public class PlatformCertificateManager {
+public class PlatformCertificateManager implements InitializingBean {
 
     private final PlatformCertificateStore platformCertificateStore;
 
@@ -35,8 +38,13 @@ public class PlatformCertificateManager {
      */
     public void reloadPlatformCertificate() {
         platformCertificateStore.evict();
-        queryPlatformCertificate("");
+        platformCertificateStore.fetchPlatformCertificate();
+        log.info("加载平台证书成功");
     }
 
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        reloadPlatformCertificate();
+    }
 }

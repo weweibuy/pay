@@ -1,4 +1,4 @@
-package com.weweibuy.pay.wx.config;
+package com.weweibuy.pay.wx.config.properties;
 
 import com.weweibuy.framework.common.core.exception.Exceptions;
 import com.weweibuy.framework.common.core.utils.DateTimeUtils;
@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
  **/
 @Slf4j
 @Data
+@ConfigurationProperties(prefix = "wx.pay")
 public class WxAppProperties {
 
     /**

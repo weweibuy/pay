@@ -1,12 +1,13 @@
 package com.weweibuy.pay.wx.support;
 
-import com.weweibuy.pay.wx.client.DownloadCertificateClient;
-import com.weweibuy.pay.wx.client.dto.resp.DownloadCertificateRespDTO;
-import com.weweibuy.pay.wx.config.VerifySignFeignFilter;
-import com.weweibuy.pay.wx.config.WxAppProperties;
 import com.weweibuy.framework.common.core.exception.Exceptions;
 import com.weweibuy.framework.common.core.support.AlarmService;
 import com.weweibuy.framework.common.log.support.LogTraceContext;
+import com.weweibuy.pay.wx.client.DownloadCertificateClient;
+import com.weweibuy.pay.wx.client.dto.resp.DownloadCertificateRespDTO;
+import com.weweibuy.pay.wx.config.VerifySignFeignFilter;
+import com.weweibuy.pay.wx.config.properties.WxAppProperties;
+import com.weweibuy.pay.wx.constant.CertificateCacheConstant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
@@ -22,13 +23,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 平台证书存储
+ *
  * @author durenhao
  * @date 2021/10/30 13:27
  **/
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@CacheConfig(cacheNames = "platform_certificate_cache")
+@CacheConfig(cacheNames = CertificateCacheConstant.PLATFORM_CERTIFICATE_CACHE_NAME)
 public class PlatformCertificateStore implements InitializingBean {
 
     private final WxAppProperties wxAppProperties;

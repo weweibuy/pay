@@ -1,0 +1,13 @@
+server:
+  port: 6080
+
+
+wx:
+  pay:
+    merchant-id: 124
+    app-id: 124
+    api-key: 12345678901234567890123456789012
+    private-key-info:
+      - serial-no: 123213
+        private-key-path: test.pem
+        expire-time: 2021-12-12 00:00:00

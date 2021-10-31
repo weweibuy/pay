@@ -1,6 +1,6 @@
 package com.weweibuy.pay.wx.client.dto.req;
 
-import com.weweibuy.pay.wx.config.WxAppProperties;
+import com.weweibuy.pay.wx.config.properties.WxAppProperties;
 import lombok.Builder;
 import lombok.Data;
 
