@@ -97,12 +97,12 @@ public class ScheduledRefreshConfig implements InitializingBean {
                 long day = between.toDays();
                 if (day <= 0) {
                     log.warn("商户证书: {}, 已经失效, 请更换证书", i);
-                    alarmService.sendAlarmFormatMsg(
+                    alarmService.sendAlarmFormatMsg(AlarmService.AlarmLevel.WARN,
                             "商户证书", "商户证书: 编号: %s, 路径: %s, 已经失效, 请更换证书",
                             i.getSerialNo(), i.getPrivateKeyPath());
                 } else if (day <= 10) {
                     log.warn("商户证书: {}, 还有: {} 天失效, 请续期或更换证书", privateKeyInfo, day);
-                    alarmService.sendAlarmFormatMsg(
+                    alarmService.sendAlarmFormatMsg(AlarmService.AlarmLevel.WARN,
                             "商户证书", "商户证书: 编号: %s, 路径: %s, 还有: %s 天失效, 请续期或更换证书",
                             i.getSerialNo(), i.getPrivateKeyPath(), day);
                 }

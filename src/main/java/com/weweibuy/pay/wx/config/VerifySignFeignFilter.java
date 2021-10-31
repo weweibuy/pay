@@ -67,18 +67,18 @@ public class VerifySignFeignFilter implements FeignFilter {
         try {
             authorization = SignAndVerifySignUtils.authorization(request, wxAppProperties);
         } catch (SignatureException e) {
-            alarmService.sendAlarm(ALARM_BIZ_TYPE,
-                    String.format("请求微信: %s %s 生成签名失败: %s, trace: %s",
-                            request.httpMethod(),
-                            request.url(),
-                            e.getMessage(),
-                            LogTraceContext.getTraceCodeOrEmpty()));
+            alarmService.sendAlarmFormatMsg(AlarmService.AlarmLevel.WARN, ALARM_BIZ_TYPE,
+                    "请求微信: %s %s 生成签名失败: %s, trace: %s",
+                    request.httpMethod(),
+                    request.url(),
+                    e.getMessage(),
+                    LogTraceContext.getTraceCodeOrEmpty());
             throw Exceptions.business("请求微信签名失败", e);
         } catch (InvalidKeyException e) {
-            alarmService.sendAlarm(ALARM_BIZ_TYPE,
-                    String.format("请求微信: 商户签名证书无效: %s, trace: %s",
-                            e.getMessage(),
-                            LogTraceContext.getTraceCodeOrEmpty()));
+            alarmService.sendAlarmFormatMsg(AlarmService.AlarmLevel.CRITICAL, ALARM_BIZ_TYPE,
+                    "请求微信: 商户签名证书无效: %s, trace: %s",
+                    e.getMessage(),
+                    LogTraceContext.getTraceCodeOrEmpty());
             throw Exceptions.business("请求微信签名证书无效", e);
         }
         request.requestTemplate().header(WxApiConstant.AUTHORIZATION_HEADER, Collections.singleton(authorization));
@@ -100,7 +100,7 @@ public class VerifySignFeignFilter implements FeignFilter {
         }
         int status = response.status();
         if (status == 401) {
-            alarmService.sendAlarmFormatMsg(ALARM_BIZ_TYPE, "请求微信: %s %s, 签名错误, trace: %s",
+            alarmService.sendAlarmFormatMsg(AlarmService.AlarmLevel.CRITICAL, ALARM_BIZ_TYPE, "请求微信: %s %s, 签名错误, trace: %s",
                     request.httpMethod(), request.url(), LogTraceContext.getTraceCodeOrEmpty());
             return response;
         }
@@ -146,9 +146,9 @@ public class VerifySignFeignFilter implements FeignFilter {
         Map<String, X509Certificate> stringX509CertificateMap = CertificatesHelper.platformCertificate(downloadCertificateRespDTO, wxAppProperties);
         X509Certificate x509Certificate = stringX509CertificateMap.get(wxResponseHeader.getSerial());
         if (x509Certificate == null) {
-            alarmService.sendAlarm(ALARM_BIZ_TYPE,
-                    String.format("下载平台证书时, 无法找到平台签名证书, trace: %s",
-                            LogTraceContext.getTraceCodeOrEmpty()));
+            alarmService.sendAlarmFormatMsg(AlarmService.AlarmLevel.CRITICAL, ALARM_BIZ_TYPE,
+                    "下载平台证书时, 无法找到平台签名证书, trace: %s",
+                    LogTraceContext.getTraceCodeOrEmpty());
             throw Exceptions.business("下载平台证书时, 无法找到平台签名证书");
         }
 
@@ -180,28 +180,28 @@ public class VerifySignFeignFilter implements FeignFilter {
             boolean verifySign = SignAndVerifySignUtils.verifySign(wxResponseHeader, body, certificate);
             // 验签失败
             if (!verifySign) {
-                alarmService.sendAlarm(ALARM_BIZ_TYPE,
-                        String.format("请求微信: %s %s , 响应验签, 验签失败, trace: %s",
-                                request.httpMethod(),
-                                request.url(),
-                                LogTraceContext.getTraceCodeOrEmpty()));
+                alarmService.sendAlarmFormatMsg(AlarmService.AlarmLevel.WARN, ALARM_BIZ_TYPE,
+                        "请求微信: %s %s , 响应验签, 验签失败, trace: %s",
+                        request.httpMethod(),
+                        request.url(),
+                        LogTraceContext.getTraceCodeOrEmpty());
                 throw Exceptions.business("微信响应验签,验签失败");
             }
         } catch (SignatureException e) {
-            alarmService.sendAlarm(ALARM_BIZ_TYPE,
-                    String.format("请求微信: %s %s 响应验签, 生成签名失败: %s, trace: %s",
-                            request.httpMethod(),
-                            request.url(),
-                            e.getMessage(),
-                            LogTraceContext.getTraceCodeOrEmpty()));
+            alarmService.sendAlarmFormatMsg(AlarmService.AlarmLevel.WARN, ALARM_BIZ_TYPE,
+                    "请求微信: %s %s 响应验签, 生成签名失败: %s, trace: %s",
+                    request.httpMethod(),
+                    request.url(),
+                    e.getMessage(),
+                    LogTraceContext.getTraceCodeOrEmpty());
             throw Exceptions.business("微信响应验签, 生成签名失败", e);
         } catch (InvalidKeyException e) {
-            alarmService.sendAlarm(ALARM_BIZ_TYPE,
-                    String.format("请求微信: %s %s , 响应验签, 微信平台证书无效: %s, trace: %s",
-                            request.httpMethod(),
-                            request.url(),
-                            e.getMessage(),
-                            LogTraceContext.getTraceCodeOrEmpty()));
+            alarmService.sendAlarmFormatMsg(AlarmService.AlarmLevel.CRITICAL, ALARM_BIZ_TYPE,
+                    "请求微信: %s %s , 响应验签, 微信平台证书无效: %s, trace: %s",
+                    request.httpMethod(),
+                    request.url(),
+                    e.getMessage(),
+                    LogTraceContext.getTraceCodeOrEmpty());
             throw Exceptions.business("微信响应验签, 微信平台证书无效", e);
         }
     }
@@ -221,10 +221,10 @@ public class VerifySignFeignFilter implements FeignFilter {
         }
         x509Certificate = platformCertificateManager.queryPlatformCertificate(wxResponseHeader.getSerial());
         if (x509Certificate == null) {
-            alarmService.sendAlarm(ALARM_BIZ_TYPE,
-                    String.format("无法加载获取平台证书: %s, trace: %s",
-                            wxResponseHeader.getSerial(),
-                            LogTraceContext.getTraceCode().orElse("")));
+            alarmService.sendAlarmFormatMsg(AlarmService.AlarmLevel.CRITICAL, ALARM_BIZ_TYPE,
+                    "无法加载获取平台证书: %s, trace: %s",
+                    wxResponseHeader.getSerial(),
+                    LogTraceContext.getTraceCode().orElse(""));
             throw Exceptions.business("无法加载获取平台证书: " + wxResponseHeader.getSerial());
         }
 
@@ -243,7 +243,7 @@ public class VerifySignFeignFilter implements FeignFilter {
                 .map(c -> c.getMessage())
                 .ifPresent(m -> {
                     String msg = m + ", 请求id: " + wxResponseHeader.getRequestId();
-                    alarmService.sendAlarm(ALARM_BIZ_TYPE, msg + ", trace: "
+                    alarmService.sendAlarm(AlarmService.AlarmLevel.WARN, ALARM_BIZ_TYPE, msg + ", trace: "
                             + LogTraceContext.getTraceCode().orElse(""));
                     throw Exceptions.business(msg);
                 });
@@ -253,7 +253,7 @@ public class VerifySignFeignFilter implements FeignFilter {
         // 拒绝5分钟之外的应答
         if (Duration.between(instant, Instant.now()).abs().toMinutes() >= 5) {
             String msg = "微信响应时间戳异常, 请求id: " + wxResponseHeader.getRequestId();
-            alarmService.sendAlarm(ALARM_BIZ_TYPE, msg + ", trace: "
+            alarmService.sendAlarm(AlarmService.AlarmLevel.WARN, ALARM_BIZ_TYPE, msg + ", trace: "
                     + LogTraceContext.getTraceCode().orElse(""));
             throw Exceptions.business(msg);
         }

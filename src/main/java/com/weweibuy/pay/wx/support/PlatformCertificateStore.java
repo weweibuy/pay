@@ -49,7 +49,7 @@ public class PlatformCertificateStore {
         DownloadCertificateRespDTO downloadCertificateRespDTO = downloadCertificateClient.downloadCertificate();
         Map<String, X509Certificate> stringX509CertificateMap = CertificatesHelper.platformCertificate(downloadCertificateRespDTO, wxAppProperties);
         if (MapUtils.isEmpty(stringX509CertificateMap)) {
-            alarmService.sendAlarm(VerifySignFeignFilter.ALARM_BIZ_TYPE, "无法成功加载平台证书, trace: " + LogTraceContext.getTraceCode().orElse(""));
+            alarmService.sendAlarm(AlarmService.AlarmLevel.CRITICAL, VerifySignFeignFilter.ALARM_BIZ_TYPE, "无法成功加载平台证书, trace: " + LogTraceContext.getTraceCodeOrEmpty());
             throw Exceptions.business("无法成功加载平台证书");
         }
         return stringX509CertificateMap;
