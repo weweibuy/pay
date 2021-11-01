@@ -2,6 +2,7 @@ server:
   port: 6080
 
 
+
 wx:
   pay:
     merchant-id: 124

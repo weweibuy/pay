@@ -24,8 +24,8 @@ public class SignAndEncryptController {
 
 
     @GetMapping("/encrypt")
-    public CommonDataResponse<String> encrypt(@RequestBody EncryptReqDTO encryptReqDTO){
-
+    public CommonDataResponse<String> encrypt(@RequestBody EncryptReqDTO encryptReqDTO) {
+        return CommonDataResponse.success("");
     }
 
 

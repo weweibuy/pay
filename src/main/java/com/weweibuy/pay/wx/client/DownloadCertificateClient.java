@@ -1,6 +1,7 @@
 package com.weweibuy.pay.wx.client;
 
 import com.weweibuy.pay.wx.client.dto.resp.DownloadCertificateRespDTO;
+import com.weweibuy.pay.wx.config.WxFeignSnakeCaseEncoderAndDecoder;
 import com.weweibuy.pay.wx.constant.WxApiConstant;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
  * @author durenhao
  * @date 2021/10/30 11:14
  **/
-@FeignClient(name = "downloadCertificateClient", contextId = "downloadCertificateClient", url = WxApiConstant.DOWNLOAD_CERTIFICATE_URL)
+@FeignClient(name = "downloadCertificateClient", contextId = "downloadCertificateClient",
+        url = WxApiConstant.DOWNLOAD_CERTIFICATE_URL, configuration = WxFeignSnakeCaseEncoderAndDecoder.class)
 public interface DownloadCertificateClient {
 
 

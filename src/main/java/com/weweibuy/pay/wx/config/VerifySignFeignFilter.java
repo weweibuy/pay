@@ -1,5 +1,10 @@
 package com.weweibuy.pay.wx.config;
 
+import com.weweibuy.framework.common.core.exception.Exceptions;
+import com.weweibuy.framework.common.core.support.AlarmService;
+import com.weweibuy.framework.common.feign.support.FeignFilter;
+import com.weweibuy.framework.common.feign.support.FeignFilterChain;
+import com.weweibuy.framework.common.log.support.LogTraceContext;
 import com.weweibuy.pay.wx.client.dto.resp.DownloadCertificateRespDTO;
 import com.weweibuy.pay.wx.client.dto.resp.WxResponseHeader;
 import com.weweibuy.pay.wx.config.properties.WxAppProperties;
@@ -7,18 +12,15 @@ import com.weweibuy.pay.wx.constant.WxApiConstant;
 import com.weweibuy.pay.wx.manager.PlatformCertificateManager;
 import com.weweibuy.pay.wx.support.CertificatesHelper;
 import com.weweibuy.pay.wx.utils.SignAndVerifySignUtils;
-import com.weweibuy.framework.common.core.exception.Exceptions;
-import com.weweibuy.framework.common.core.support.AlarmService;
-import com.weweibuy.framework.common.core.utils.JackJsonUtils;
-import com.weweibuy.framework.common.feign.support.FeignFilter;
-import com.weweibuy.framework.common.feign.support.FeignFilterChain;
-import com.weweibuy.framework.common.log.support.LogTraceContext;
 import feign.Request;
 import feign.Response;
 import feign.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.validation.Validator;
@@ -41,7 +43,7 @@ import java.util.Map;
 @Order(0)
 @RequiredArgsConstructor
 @Component
-public class VerifySignFeignFilter implements FeignFilter {
+public class VerifySignFeignFilter implements FeignFilter, InitializingBean {
 
     private final PlatformCertificateManager platformCertificateManager;
 
@@ -51,7 +53,14 @@ public class VerifySignFeignFilter implements FeignFilter {
 
     private final Validator validator;
 
+    private final Environment environment;
+
     public static final String ALARM_BIZ_TYPE = "微信支付";
+
+    /**
+     * 是否为 mock 环境
+     */
+    private boolean isMock = false;
 
     @Override
     public Response filter(Request request, Request.Options options, FeignFilterChain chain) throws IOException {
@@ -141,7 +150,7 @@ public class VerifySignFeignFilter implements FeignFilter {
             }
         }
 
-        DownloadCertificateRespDTO downloadCertificateRespDTO = JackJsonUtils.readSnakeCaseValue(bodyStr, DownloadCertificateRespDTO.class);
+        DownloadCertificateRespDTO downloadCertificateRespDTO = WxFeignSnakeCaseEncoderAndDecoder.getWxObjectMapper().readValue(bodyStr, DownloadCertificateRespDTO.class);
 
         Map<String, X509Certificate> stringX509CertificateMap = CertificatesHelper.platformCertificate(downloadCertificateRespDTO, wxAppProperties);
         X509Certificate x509Certificate = stringX509CertificateMap.get(wxResponseHeader.getSerial());
@@ -250,8 +259,8 @@ public class VerifySignFeignFilter implements FeignFilter {
         Long timestamp = wxResponseHeader.getTimestamp();
 
         Instant instant = Instant.ofEpochSecond(timestamp);
-        // 拒绝5分钟之外的应答
-        if (Duration.between(instant, Instant.now()).abs().toMinutes() >= 5) {
+        // 拒绝5分钟之外的应答  mock 环境不检验
+        if (!isMock && Duration.between(instant, Instant.now()).abs().toMinutes() >= 5) {
             String msg = "微信响应时间戳异常, 请求id: " + wxResponseHeader.getRequestId();
             alarmService.sendAlarm(AlarmService.AlarmLevel.WARN, ALARM_BIZ_TYPE, msg + ", trace: "
                     + LogTraceContext.getTraceCode().orElse(""));
@@ -270,4 +279,11 @@ public class VerifySignFeignFilter implements FeignFilter {
         return WxApiConstant.DOWNLOAD_BILL_FILE_URL.equals(split[0]);
     }
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        String profiles = environment.getProperty("spring.profiles.active");
+        if (StringUtils.isNotBlank(profiles) && profiles.indexOf("mock") != -1) {
+            isMock = true;
+        }
+    }
 }
