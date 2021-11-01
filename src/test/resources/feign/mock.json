@@ -1,0 +1,9 @@
+[
+  {
+    "host": "api.mch.weixin.qq.com",
+    "path": "/v3/certificates",
+    "method": "GET",
+    "target": "platform_certificates.json",
+    "enable": true
+  }
+]
