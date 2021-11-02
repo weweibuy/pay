@@ -8,19 +8,17 @@ import com.weweibuy.framework.common.log.support.LogTraceContext;
 import com.weweibuy.pay.wx.client.dto.resp.DownloadCertificateRespDTO;
 import com.weweibuy.pay.wx.client.dto.resp.WxResponseHeader;
 import com.weweibuy.pay.wx.config.properties.WxAppProperties;
-import com.weweibuy.pay.wx.model.constant.WxApiConstant;
 import com.weweibuy.pay.wx.manager.PlatformCertificateManager;
+import com.weweibuy.pay.wx.model.constant.WxApiConstant;
 import com.weweibuy.pay.wx.support.CertificatesHelper;
+import com.weweibuy.pay.wx.support.WxSignHelper;
 import com.weweibuy.pay.wx.utils.SignAndVerifySignUtils;
 import feign.Request;
 import feign.Response;
 import feign.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.validation.Validator;
@@ -28,8 +26,6 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 
@@ -43,7 +39,7 @@ import java.util.Map;
 @Order(0)
 @RequiredArgsConstructor
 @Component
-public class VerifySignFeignFilter implements FeignFilter, InitializingBean {
+public class VerifySignFeignFilter implements FeignFilter {
 
     private final PlatformCertificateManager platformCertificateManager;
 
@@ -53,7 +49,7 @@ public class VerifySignFeignFilter implements FeignFilter, InitializingBean {
 
     private final Validator validator;
 
-    private final Environment environment;
+    private final WxSignHelper wxSignHelper;
 
     public static final String ALARM_BIZ_TYPE = "微信支付";
 
@@ -64,12 +60,20 @@ public class VerifySignFeignFilter implements FeignFilter, InitializingBean {
 
     @Override
     public Response filter(Request request, Request.Options options, FeignFilterChain chain) throws IOException {
+        if (!isReqWx(request)) {
+            return chain.doFilter(request, options);
+        }
         // 增加签名请求头
         request = addSingHeader(request);
         Response response = chain.doFilter(request, options);
         return verifySign(response, request);
     }
 
+
+    private boolean isReqWx(Request request) {
+        String url = request.url();
+        return url.startsWith(WxApiConstant.WX_MCH_PAY_HOST);
+    }
 
     private Request addSingHeader(Request request) {
         String authorization = null;
@@ -120,7 +124,7 @@ public class VerifySignFeignFilter implements FeignFilter, InitializingBean {
 
         // 响应头
         WxResponseHeader wxResponseHeader = WxResponseHeader.fromWxResponse(response);
-        verifyResponseHeader(wxResponseHeader);
+        wxSignHelper.verifyResponseHeader(wxResponseHeader);
 
         // 下载证书接口
         if (isCertificateUrl(request)) {
@@ -241,34 +245,6 @@ public class VerifySignFeignFilter implements FeignFilter, InitializingBean {
     }
 
 
-    /**
-     * 校验请求头
-     *
-     * @param wxResponseHeader
-     */
-    private void verifyResponseHeader(WxResponseHeader wxResponseHeader) {
-        validator.validate(wxResponseHeader).stream()
-                .findFirst()
-                .map(c -> c.getMessage())
-                .ifPresent(m -> {
-                    String msg = m + ", 请求id: " + wxResponseHeader.getRequestId();
-                    alarmService.sendAlarm(AlarmService.AlarmLevel.WARN, ALARM_BIZ_TYPE, msg + ", trace: "
-                            + LogTraceContext.getTraceCode().orElse(""));
-                    throw Exceptions.business(msg);
-                });
-        Long timestamp = wxResponseHeader.getTimestamp();
-
-        Instant instant = Instant.ofEpochSecond(timestamp);
-        // 拒绝5分钟之外的应答  mock 环境不检验
-        if (!isMock && Duration.between(instant, Instant.now()).abs().toMinutes() >= 5) {
-            String msg = "微信响应时间戳异常, 请求id: " + wxResponseHeader.getRequestId();
-            alarmService.sendAlarm(AlarmService.AlarmLevel.WARN, ALARM_BIZ_TYPE, msg + ", trace: "
-                    + LogTraceContext.getTraceCode().orElse(""));
-            throw Exceptions.business(msg);
-        }
-
-    }
-
     private boolean isCertificateUrl(Request request) {
         String[] split = request.requestTemplate().url().split("\\?");
         return WxApiConstant.DOWNLOAD_CERTIFICATE_URL.equals(split[0]);
@@ -279,11 +255,5 @@ public class VerifySignFeignFilter implements FeignFilter, InitializingBean {
         return WxApiConstant.DOWNLOAD_BILL_FILE_URL.equals(split[0]);
     }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        String profiles = environment.getProperty("spring.profiles.active");
-        if (StringUtils.isNotBlank(profiles) && profiles.indexOf("mock") != -1) {
-            isMock = true;
-        }
-    }
+
 }

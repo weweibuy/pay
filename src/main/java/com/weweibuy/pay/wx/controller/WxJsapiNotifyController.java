@@ -1,10 +1,15 @@
 package com.weweibuy.pay.wx.controller;
 
-import com.weweibuy.framework.common.core.model.dto.CommonCodeResponse;
+import com.weweibuy.framework.common.core.exception.Exceptions;
 import com.weweibuy.pay.wx.model.dto.req.WxJsapiNotifyReqDTO;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import com.weweibuy.pay.wx.model.dto.resp.WxJsapiNotifyRespDTO;
+import com.weweibuy.pay.wx.support.JsapiNotifyHelper;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.MapUtils;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.Map;
 
 /**
  * Wx jsapi 支付通知接口
@@ -13,7 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2021/11/2 22:14
  **/
 @RestController
+@RequestMapping("/wx/pay/jsapi")
+@RequiredArgsConstructor
 public class WxJsapiNotifyController {
+
+    private final JsapiNotifyHelper jsapiNotifyHelper;
 
 
     /**
@@ -23,9 +32,14 @@ public class WxJsapiNotifyController {
      * @param notifyReq
      * @return
      */
-    @PostMapping("/wx/pay/notify")
-    public CommonCodeResponse payCallBack(@RequestBody WxJsapiNotifyReqDTO notifyReq) {
-        return CommonCodeResponse.success();
+    @PostMapping("/notify")
+    public WxJsapiNotifyRespDTO payCallBack(@RequestHeader Map<String, String> header,
+                                            @RequestBody @Valid WxJsapiNotifyReqDTO notifyReq) {
+        if (MapUtils.isEmpty(header)) {
+            throw Exceptions.business("无签名数据");
+        }
+        jsapiNotifyHelper.verifySign(header);
+        return WxJsapiNotifyRespDTO.success();
     }
 
 }

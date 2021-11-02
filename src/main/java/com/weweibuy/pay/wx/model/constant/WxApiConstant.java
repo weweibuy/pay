@@ -13,7 +13,7 @@ public interface WxApiConstant {
     /**
      * 微信商户支付 Host
      */
-    String WX_MCH_PAY_HOST = "api.mch.weixin.qq.com";
+    String WX_MCH_PAY_HOST = "https://api.mch.weixin.qq.com";
 
     /**
      * 签名方法

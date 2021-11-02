@@ -1,10 +1,10 @@
 package com.weweibuy.pay.wx.support;
 
-import com.weweibuy.framework.common.codec.aes.Aes256GcmUtils;
 import com.weweibuy.pay.wx.client.dto.resp.DownloadCertificateRespDTO;
 import com.weweibuy.pay.wx.config.properties.WxAppProperties;
 import com.weweibuy.pay.wx.model.dto.common.WxEncryptDataDTO;
 import com.weweibuy.pay.wx.model.vo.SerialNoCertificate;
+import com.weweibuy.pay.wx.utils.WxDecryptUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -33,19 +33,16 @@ public class CertificatesHelper {
     /**
      * 平台证书
      *
-     * @param encryptCertificate
+     * @param wxEncryptDataDTO
      * @param secretKey
      * @return
      */
-    public static X509Certificate platformCertificate(WxEncryptDataDTO encryptCertificate,
+    public static X509Certificate platformCertificate(WxEncryptDataDTO wxEncryptDataDTO,
                                                       SecretKey secretKey) {
 
-        String cipherText = encryptCertificate.getCiphertext().replaceAll("\"", "");
-        String associatedData = encryptCertificate.getAssociatedData().replaceAll("\"", "");
-        String nonce = encryptCertificate.getNonce().replaceAll("\"", "");
         X509Certificate x509Cert = null;
         try {
-            String cert = Aes256GcmUtils.decryptBase64Text(cipherText, associatedData, nonce, secretKey);
+            String cert = WxDecryptUtils.decrypt(wxEncryptDataDTO, secretKey);
             CertificateFactory cf = CertificateFactory.getInstance("X509");
             x509Cert = (X509Certificate) cf.generateCertificate(
                     new ByteArrayInputStream(cert.getBytes("utf-8")));
@@ -56,7 +53,7 @@ public class CertificatesHelper {
         try {
             x509Cert.checkValidity();
         } catch (CertificateExpiredException | CertificateNotYetValidException e) {
-            log.warn("无效的平台证书: {}", encryptCertificate);
+            log.warn("无效的平台证书: {}", wxEncryptDataDTO);
             return null;
         }
         return x509Cert;

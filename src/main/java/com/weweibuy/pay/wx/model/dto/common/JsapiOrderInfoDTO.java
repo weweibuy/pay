@@ -4,6 +4,9 @@ import com.weweibuy.pay.wx.model.eum.WxOrderTradeState;
 import com.weweibuy.pay.wx.model.eum.WxOrderTradeType;
 import lombok.Data;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -15,31 +18,37 @@ import java.time.LocalDateTime;
 @Data
 public class JsapiOrderInfoDTO {
 
+    @NotBlank(message = "应用ID不能为空")
     private String appid;
 
     /**
      * 商户号
      */
+    @NotBlank(message = "商户号不能为空")
     private String mchid;
 
     /**
      * 商户订单号
      */
+    @NotBlank(message = "商户订单号不能为空")
     private String outTradeNo;
 
     /**
      * 微信支付订单号
      */
+    @NotBlank(message = "微信支付订单号不能为空")
     private String transactionId;
 
     /**
      * 交易类型
      */
+    @NotBlank(message = "交易类型不能为空")
     private WxOrderTradeType tradeType;
 
     /***
      * 交易状态
      */
+    @NotBlank(message = "交易状态不能为空")
     private WxOrderTradeState tradeState;
 
     /**
@@ -61,16 +70,21 @@ public class JsapiOrderInfoDTO {
     /**
      * 支付完成时间
      */
+    @NotNull(message = "支付完成时间不能为空")
     private LocalDateTime successTime;
 
     /**
      * 支付者
      */
+    @NotNull(message = "支付者不能为空")
+    @Valid
     private JsapiOrderPayerDTO payer;
 
     /**
      * 订单金额信息，当支付成功时返回该字段
      */
+    @Valid
+    @NotNull(message = "订单金额不能为空")
     private JsapiOrderAmountPayedDTO amount;
 
 

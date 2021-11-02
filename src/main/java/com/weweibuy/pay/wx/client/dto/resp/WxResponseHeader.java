@@ -1,17 +1,20 @@
 package com.weweibuy.pay.wx.client.dto.resp;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.weweibuy.framework.common.core.utils.JackJsonUtils;
 import com.weweibuy.pay.wx.model.constant.WxApiConstant;
 import feign.Response;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * 微信响应头
@@ -25,56 +28,59 @@ public class WxResponseHeader {
     /**
      * 请求id
      */
+    @JsonSetter(WxApiConstant.WX_RESP_ID)
     private String requestId;
 
     /**
      * 随机数
      */
     @NotBlank(message = "微信响应随机数为空")
+    @JsonSetter(WxApiConstant.WX_SIGN_NONCE_HEADER)
     private String nonce;
 
     /**
      * 签名 base64
      */
     @NotBlank(message = "微信响应签名为空")
+    @JsonSetter(WxApiConstant.WX_SIGN_SIGNATURE_HEADER)
     private String signatureBase64;
 
     /**
      * 时间戳 秒
      */
     @NotNull(message = "微信响应时间戳为空")
+    @JsonSetter(WxApiConstant.WX_SIGN_TIMESTAMP_HEADER)
     private Long timestamp;
 
     /**
      * 证书编号
      */
     @NotNull(message = "微信响应平台证书号为空")
+    @JsonSetter(WxApiConstant.WX_SIGN_SERIAL_HEADER)
     private String serial;
 
 
     public static WxResponseHeader fromWxResponse(Response response) {
         Map<String, Collection<String>> headers = response.headers();
-        WxResponseHeader wxResponseHeader = new WxResponseHeader();
-
-        valueFromHeader(headers, WxApiConstant.WX_RESP_ID, wxResponseHeader::setRequestId);
-        valueFromHeader(headers, WxApiConstant.WX_SIGN_NONCE_HEADER, wxResponseHeader::setNonce);
-        valueFromHeader(headers, WxApiConstant.WX_SIGN_SIGNATURE_HEADER, wxResponseHeader::setSignatureBase64);
-        valueFromHeader(headers, WxApiConstant.WX_SIGN_SERIAL_HEADER, wxResponseHeader::setSerial);
-        Optional.ofNullable(headers.get(WxApiConstant.WX_SIGN_TIMESTAMP_HEADER))
-                .filter(CollectionUtils::isNotEmpty)
-                .map(l -> l.iterator().next())
-                .filter(StringUtils::isNumeric)
-                .map(Long::valueOf)
-                .ifPresent(wxResponseHeader::setTimestamp);
-        return wxResponseHeader;
+        Map<String, String> stringStringMap = convertMap(headers);
+        return fromHeader(stringStringMap);
 
     }
 
-    private static void valueFromHeader(Map<String, Collection<String>> headers, String key, Consumer<String> consumer) {
-        Optional.ofNullable(headers.get(key))
-                .filter(CollectionUtils::isNotEmpty)
-                .map(l -> l.iterator().next())
-                .ifPresent(consumer);
+    public static WxResponseHeader fromHeader(Map<String, String> header) {
+        ObjectMapper objectMapper = JackJsonUtils.getCamelCaseMapper();
+        JavaType javaType = JackJsonUtils.javaType(WxResponseHeader.class);
+        return (WxResponseHeader) objectMapper.convertValue(header, javaType);
     }
+
+    private static Map<String, String> convertMap(Map<String, Collection<String>> headers) {
+        return headers.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e ->
+                        Optional.ofNullable(e.getValue())
+                                .filter(CollectionUtils::isNotEmpty)
+                                .map(i -> i.iterator().next())
+                                .orElse(null)));
+    }
+
 
 }

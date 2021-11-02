@@ -55,6 +55,9 @@ public class WxAppProperties implements InitializingBean {
     @Length(min = 32, max = 32, message = "api密钥长度必须为32位")
     private String apiKey;
 
+    @NotBlank(message = "微信通知地址不能为空")
+    private String notifyUrl;
+
     /**
      * 证书列表
      */
