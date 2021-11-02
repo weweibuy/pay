@@ -1,30 +1,52 @@
 package com.weweibuy.pay.wx.support;
 
 import com.weweibuy.framework.common.codec.aes.Aes256GcmUtils;
+import com.weweibuy.pay.wx.client.dto.resp.DownloadCertificateRespDTO;
 import org.junit.Test;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.security.cert.X509Certificate;
 
 public class CertificatesHelperTest {
 
     @Test
     public void platformCertificate() throws Exception {
-        String pk = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwUT7DMHFwwnY5VXwqDC8\n" +
-                "pGDLtVI1jImWMbpy1PZaOA4Zkp1tpzenlMKXJmSaDg6cD/ZtoRFmsTsAATyEz+LC\n" +
-                "qpxdifRnh1LapFo4Fcsr0MrzCdwHnmif994MPLdkXqMH+x+YjkrxpyQU4wC3u17y\n" +
-                "O0DXueyWDdLjfOOLTt2ZGTbco1QwfYHXW+RFYH07MyVvy3LxkAC7Zmr/kDDVr44Z\n" +
-                "T8XU08PALi8YC6RKHLIqTeFK8gbPZRC0iGt2CHzCXX1LtF7NIA5TdVU3M9vXZrv0\n" +
-                "4CvZhPqLS5h8aorSou1Axx36PF9fHvOChOw9523wEtWo5/H0+GNGfKA3lT5Vam5z\n" +
-                "/QIDAQAB";
+        String pk = "MIIDADCCAegCCQC2LOOmdHFC4DANBgkqhkiG9w0BAQsFADBCMQswCQYDVQQGEwJY\n" +
+                "WDEVMBMGA1UEBwwMRGVmYXVsdCBDaXR5MRwwGgYDVQQKDBNEZWZhdWx0IENvbXBh\n" +
+                "bnkgTHRkMB4XDTIxMTEwMjEwMjkxMFoXDTIyMTEwMjEwMjkxMFowQjELMAkGA1UE\n" +
+                "BhMCWFgxFTATBgNVBAcMDERlZmF1bHQgQ2l0eTEcMBoGA1UECgwTRGVmYXVsdCBD\n" +
+                "b21wYW55IEx0ZDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMFE+wzB\n" +
+                "xcMJ2OVV8KgwvKRgy7VSNYyJljG6ctT2WjgOGZKdbac3p5TClyZkmg4OnA/2baER\n" +
+                "ZrE7AAE8hM/iwqqcXYn0Z4dS2qRaOBXLK9DK8wncB55on/feDDy3ZF6jB/sfmI5K\n" +
+                "8ackFOMAt7te8jtA17nslg3S43zji07dmRk23KNUMH2B11vkRWB9OzMlb8ty8ZAA\n" +
+                "u2Zq/5Aw1a+OGU/F1NPDwC4vGAukShyyKk3hSvIGz2UQtIhrdgh8wl19S7RezSAO\n" +
+                "U3VVNzPb12a79OAr2YT6i0uYfGqK0qLtQMcd+jxfXx7zgoTsPedt8BLVqOfx9Phj\n" +
+                "RnygN5U+VWpuc/0CAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAoRBNh+M1hARinQ3Z\n" +
+                "r1tq57D9691pOQbN6pBQXGRfkyAehZDixBZeix1bRD1PO92uqULoDqtY65o9w0Vu\n" +
+                "rMRCGCRGGbQ1AoKxzsyakLXCvf6AE7ssay/PtWAFZsTVOiuAW3XJBLU60Q35/j8+\n" +
+                "k3j80tDVfTkBJcC7IMeBcR8N3Q5JN53IT1CPrq+zVyewSZf8UKniC0UwSRFwDebu\n" +
+                "sWqBN9fC7nDcZOPrLxZx3pIT3hX7/mpYWZF6nc1eUZdYAtZytAjjVSGJSN/K1Q5r\n" +
+                "coV9n0xsdE63MYcJ6qastjzHHhCxdg2LK/ItG8n+dD+/SHOwRrRwhKVE2F043KlI\n" +
+                "hoyKbA==";
 
         SecretKeySpec keySpec = new SecretKeySpec("12345678901234567890123456789012".getBytes(), "AES");
-        int length = "12345678901234567890123456789012".length();
-        System.err.println(length);
 
         String all = pk.replaceAll("\n", "");
 
         String certificate = Aes256GcmUtils.encryptToBase64(all, "certificate", "61f9c719728a", keySpec);
+
         System.err.println(certificate);
+
+        DownloadCertificateRespDTO.EncryptCertificate encryptCertificate = new DownloadCertificateRespDTO.EncryptCertificate();
+
+
+        encryptCertificate.setNonce("61f9c719728a");
+        encryptCertificate.setAssociatedData("certificate");
+        encryptCertificate.setCiphertext(certificate);
+
+        X509Certificate x509Certificate = CertificatesHelper.platformCertificate(encryptCertificate, keySpec);
+        x509Certificate.checkValidity();
+
 
     }
 
