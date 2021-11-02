@@ -17,9 +17,11 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
  **/
 public class WxFeignSnakeCaseEncoderAndDecoder extends EncoderAndDecoder {
 
+    public static final String DATA_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'+08:00'";
+
     private static ObjectFactory<HttpMessageConverters> httpMessageConvertersObjectFactory;
 
-    private static final ObjectMapper WX_OBJECT_MAPPER = JackJsonUtils.createObjectMapper("yyyy-MM-dd'T'HH:mm:ss'+08:00'",
+    private static final ObjectMapper WX_OBJECT_MAPPER = JackJsonUtils.createObjectMapper(DATA_FORMAT,
             CommonConstant.DateConstant.STANDARD_DATE_FORMAT_STR, PropertyNamingStrategies.SNAKE_CASE);
 
     public WxFeignSnakeCaseEncoderAndDecoder() {

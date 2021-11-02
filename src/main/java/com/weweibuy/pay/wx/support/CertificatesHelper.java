@@ -1,9 +1,10 @@
 package com.weweibuy.pay.wx.support;
 
+import com.weweibuy.framework.common.codec.aes.Aes256GcmUtils;
 import com.weweibuy.pay.wx.client.dto.resp.DownloadCertificateRespDTO;
 import com.weweibuy.pay.wx.config.properties.WxAppProperties;
+import com.weweibuy.pay.wx.model.dto.common.WxEncryptDataDTO;
 import com.weweibuy.pay.wx.model.vo.SerialNoCertificate;
-import com.weweibuy.framework.common.codec.aes.Aes256GcmUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -36,7 +37,7 @@ public class CertificatesHelper {
      * @param secretKey
      * @return
      */
-    public static X509Certificate platformCertificate(DownloadCertificateRespDTO.EncryptCertificate encryptCertificate,
+    public static X509Certificate platformCertificate(WxEncryptDataDTO encryptCertificate,
                                                       SecretKey secretKey) {
 
         String cipherText = encryptCertificate.getCiphertext().replaceAll("\"", "");

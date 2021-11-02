@@ -5,7 +5,7 @@ import com.weweibuy.pay.wx.client.dto.req.WxRequestAuthorizationHeader;
 import com.weweibuy.pay.wx.client.dto.req.WxRequestSign;
 import com.weweibuy.pay.wx.client.dto.resp.WxResponseHeader;
 import com.weweibuy.pay.wx.config.properties.WxAppProperties;
-import com.weweibuy.pay.wx.constant.WxApiConstant;
+import com.weweibuy.pay.wx.model.constant.WxApiConstant;
 import feign.Request;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

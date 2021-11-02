@@ -1,4 +1,4 @@
-package com.weweibuy.pay.wx.constant;
+package com.weweibuy.pay.wx.model.constant;
 
 /**
  * 证书缓存常量

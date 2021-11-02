@@ -2,7 +2,7 @@ package com.weweibuy.pay.wx.config;
 
 import com.weweibuy.framework.common.feign.support.FeignLogConfigurer;
 import com.weweibuy.framework.common.feign.support.FeignLogSetting;
-import com.weweibuy.pay.wx.constant.WxApiConstant;
+import com.weweibuy.pay.wx.model.constant.WxApiConstant;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;

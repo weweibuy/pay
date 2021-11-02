@@ -1,4 +1,4 @@
-package com.weweibuy.pay.wx.controller.dto.req;
+package com.weweibuy.pay.wx.model.dto.req;
 
 import lombok.Data;
 

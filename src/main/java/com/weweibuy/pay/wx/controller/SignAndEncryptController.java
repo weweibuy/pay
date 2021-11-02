@@ -2,7 +2,7 @@ package com.weweibuy.pay.wx.controller;
 
 import com.weweibuy.framework.common.core.model.dto.CommonDataResponse;
 import com.weweibuy.pay.wx.config.properties.WxAppProperties;
-import com.weweibuy.pay.wx.controller.dto.req.EncryptReqDTO;
+import com.weweibuy.pay.wx.model.dto.req.EncryptReqDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;

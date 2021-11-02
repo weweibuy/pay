@@ -1,6 +1,6 @@
 package com.weweibuy.pay.wx.client.dto.req;
 
-import com.weweibuy.pay.wx.constant.WxApiConstant;
+import com.weweibuy.pay.wx.model.constant.WxApiConstant;
 import com.weweibuy.pay.wx.utils.SignAndVerifySignUtils;
 import com.weweibuy.framework.common.core.utils.DateTimeUtils;
 import feign.Request;

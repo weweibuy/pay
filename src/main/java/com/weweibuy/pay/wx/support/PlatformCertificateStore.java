@@ -7,7 +7,7 @@ import com.weweibuy.pay.wx.client.DownloadCertificateClient;
 import com.weweibuy.pay.wx.client.dto.resp.DownloadCertificateRespDTO;
 import com.weweibuy.pay.wx.config.VerifySignFeignFilter;
 import com.weweibuy.pay.wx.config.properties.WxAppProperties;
-import com.weweibuy.pay.wx.constant.CertificateCacheConstant;
+import com.weweibuy.pay.wx.model.constant.CertificateCacheConstant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;

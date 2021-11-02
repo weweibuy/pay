@@ -1,6 +1,6 @@
 package com.weweibuy.pay.wx.client.dto.resp;
 
-import com.weweibuy.pay.wx.constant.WxApiConstant;
+import com.weweibuy.pay.wx.model.constant.WxApiConstant;
 import feign.Response;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;

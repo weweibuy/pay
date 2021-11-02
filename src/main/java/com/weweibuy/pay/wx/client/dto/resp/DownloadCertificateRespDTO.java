@@ -1,5 +1,6 @@
 package com.weweibuy.pay.wx.client.dto.resp;
 
+import com.weweibuy.pay.wx.model.dto.common.WxEncryptDataDTO;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -27,21 +28,9 @@ public class DownloadCertificateRespDTO {
 
         private LocalDateTime expireTime;
 
-        private EncryptCertificate encryptCertificate;
+        private WxEncryptDataDTO encryptCertificate;
 
     }
 
-    @Data
-    public static class EncryptCertificate {
-
-        private String algorithm;
-
-        private String nonce;
-
-        private String associatedData;
-
-        private String ciphertext;
-
-    }
 
 }

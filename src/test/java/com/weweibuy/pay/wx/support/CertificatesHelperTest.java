@@ -1,7 +1,7 @@
 package com.weweibuy.pay.wx.support;
 
 import com.weweibuy.framework.common.codec.aes.Aes256GcmUtils;
-import com.weweibuy.pay.wx.client.dto.resp.DownloadCertificateRespDTO;
+import com.weweibuy.pay.wx.model.dto.common.WxEncryptDataDTO;
 import org.junit.Test;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -37,7 +37,7 @@ public class CertificatesHelperTest {
 
         System.err.println(certificate);
 
-        DownloadCertificateRespDTO.EncryptCertificate encryptCertificate = new DownloadCertificateRespDTO.EncryptCertificate();
+        WxEncryptDataDTO encryptCertificate = new WxEncryptDataDTO();
 
 
         encryptCertificate.setNonce("61f9c719728a");

@@ -1,4 +1,4 @@
-package com.weweibuy.pay.wx.constant;
+package com.weweibuy.pay.wx.model.constant;
 
 import org.springframework.http.HttpHeaders;
 
@@ -71,6 +71,20 @@ public interface WxApiConstant {
      * 微信签名 签名 header
      */
     String WX_SIGN_SIGNATURE_HEADER = "Wechatpay-Signature";
+
+    /**
+     * 微信通知的支付成功类型，
+     * 支付成功通知的类型为TRANSACTION.SUCCESS
+     * https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_1_5.shtml
+     */
+    String WX_NOTIFY_EVENT_TYPE_SUCCESS = "TRANSACTION.SUCCESS";
+
+    /**
+     * 微信通知的资源数据类型，
+     * 支付成功通知为encrypt-resource
+     */
+    String WX_NOTIFY_RESOURCE_TYPE_SUCCESS = "encrypt-resource";
+
 
 
 }

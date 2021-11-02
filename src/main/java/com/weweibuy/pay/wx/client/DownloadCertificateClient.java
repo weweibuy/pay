@@ -2,7 +2,7 @@ package com.weweibuy.pay.wx.client;
 
 import com.weweibuy.pay.wx.client.dto.resp.DownloadCertificateRespDTO;
 import com.weweibuy.pay.wx.config.WxFeignSnakeCaseEncoderAndDecoder;
-import com.weweibuy.pay.wx.constant.WxApiConstant;
+import com.weweibuy.pay.wx.model.constant.WxApiConstant;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
