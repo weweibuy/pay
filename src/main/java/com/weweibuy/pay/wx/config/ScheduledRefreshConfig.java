@@ -7,9 +7,12 @@ import com.weweibuy.framework.common.core.utils.IdWorker;
 import com.weweibuy.framework.common.log.support.LogTraceContext;
 import com.weweibuy.pay.wx.config.properties.WxAppProperties;
 import com.weweibuy.pay.wx.manager.PlatformCertificateManager;
+import com.weweibuy.pay.wx.model.constant.AlarmConstant;
+import com.weweibuy.pay.wx.model.event.BizAlarmEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -37,7 +40,7 @@ public class ScheduledRefreshConfig implements InitializingBean {
 
     private final WxAppProperties wxAppProperties;
 
-    private final AlarmService alarmService;
+    private final ApplicationContext applicationContext;
 
     private ScheduledExecutorService schedule = new ScheduledThreadPoolExecutor(
             1,
@@ -97,14 +100,20 @@ public class ScheduledRefreshConfig implements InitializingBean {
                 long day = between.toDays();
                 if (day <= 0) {
                     log.warn("商户证书: {}, 已经失效, 请更换证书", i);
-                    alarmService.sendAlarmFormatMsg(AlarmService.AlarmLevel.WARN,
-                            "商户证书", "商户证书: 编号: %s, 路径: %s, 已经失效, 请更换证书",
-                            i.getSerialNo(), i.getPrivateKeyPath());
+                    applicationContext.publishEvent(BizAlarmEvent.builder()
+                            .alarmLevel(AlarmService.AlarmLevel.WARN)
+                            .bizType(AlarmConstant.WX_PAY_ALARM_BIZ_TYPE)
+                            .msg(String.format("商户证书: 编号: %s, 路径: %s, 已经失效, 请更换证书",
+                                    i.getSerialNo(), i.getPrivateKeyPath()))
+                            .build());
                 } else if (day <= 10) {
                     log.warn("商户证书: {}, 还有: {} 天失效, 请续期或更换证书", privateKeyInfo, day);
-                    alarmService.sendAlarmFormatMsg(AlarmService.AlarmLevel.WARN,
-                            "商户证书", "商户证书: 编号: %s, 路径: %s, 还有: %s 天失效, 请续期或更换证书",
-                            i.getSerialNo(), i.getPrivateKeyPath(), day);
+                    applicationContext.publishEvent(BizAlarmEvent.builder()
+                            .alarmLevel(AlarmService.AlarmLevel.WARN)
+                            .bizType(AlarmConstant.WX_PAY_ALARM_BIZ_TYPE)
+                            .msg(String.format("商户证书: 编号: %s, 路径: %s, 还有: %s 天失效, 请续期或更换证书",
+                                    i.getSerialNo(), i.getPrivateKeyPath(), day))
+                            .build());
                 }
             });
         } catch (Exception e) {

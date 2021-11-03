@@ -5,8 +5,8 @@ import com.weweibuy.framework.common.core.support.AlarmService;
 import com.weweibuy.framework.common.log.support.LogTraceContext;
 import com.weweibuy.pay.wx.client.DownloadCertificateClient;
 import com.weweibuy.pay.wx.client.dto.resp.DownloadCertificateRespDTO;
-import com.weweibuy.pay.wx.config.VerifySignFeignFilter;
 import com.weweibuy.pay.wx.config.properties.WxAppProperties;
+import com.weweibuy.pay.wx.model.constant.AlarmConstant;
 import com.weweibuy.pay.wx.model.constant.CertificateCacheConstant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,7 @@ public class PlatformCertificateStore {
         DownloadCertificateRespDTO downloadCertificateRespDTO = downloadCertificateClient.downloadCertificate();
         Map<String, X509Certificate> stringX509CertificateMap = CertificatesHelper.platformCertificate(downloadCertificateRespDTO, wxAppProperties);
         if (MapUtils.isEmpty(stringX509CertificateMap)) {
-            alarmService.sendAlarm(AlarmService.AlarmLevel.CRITICAL, VerifySignFeignFilter.ALARM_BIZ_TYPE, "无法成功加载平台证书, trace: " + LogTraceContext.getTraceCodeOrEmpty());
+            alarmService.sendAlarm(AlarmService.AlarmLevel.CRITICAL, AlarmConstant.WX_PAY_ALARM_BIZ_TYPE, "无法成功加载平台证书, trace: " + LogTraceContext.getTraceCodeOrEmpty());
             throw Exceptions.business("无法成功加载平台证书");
         }
         return stringX509CertificateMap;

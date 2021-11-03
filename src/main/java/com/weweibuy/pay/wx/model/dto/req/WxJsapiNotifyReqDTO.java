@@ -1,10 +1,12 @@
 package com.weweibuy.pay.wx.model.dto.req;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.weweibuy.pay.wx.config.WxFeignSnakeCaseEncoderAndDecoder;
+import com.weweibuy.pay.wx.model.constant.WxApiConstant;
 import com.weweibuy.pay.wx.model.dto.common.JsapiOrderInfoDTO;
 import com.weweibuy.pay.wx.model.dto.common.WxEncryptDataDTO;
-import com.weweibuy.pay.wx.model.constant.WxApiConstant;
 import lombok.Data;
 
 import javax.validation.Valid;
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
  * @date 2021/11/2 22:16
  **/
 @Data
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class WxJsapiNotifyReqDTO {
 
     /**

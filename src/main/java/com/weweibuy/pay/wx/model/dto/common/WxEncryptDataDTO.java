@@ -1,5 +1,7 @@
 package com.weweibuy.pay.wx.model.dto.common;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -11,6 +13,7 @@ import javax.validation.constraints.NotBlank;
  * @date 2021/11/2 22:28
  **/
 @Data
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class WxEncryptDataDTO {
 
     /**

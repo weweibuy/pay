@@ -1,14 +1,17 @@
 package com.weweibuy.pay.wx.utils;
 
 import com.weweibuy.framework.common.core.exception.Exceptions;
+import com.weweibuy.framework.common.core.utils.JackJsonUtils;
 import com.weweibuy.pay.wx.client.dto.req.WxRequestAuthorizationHeader;
 import com.weweibuy.pay.wx.client.dto.req.WxRequestSign;
 import com.weweibuy.pay.wx.client.dto.resp.WxResponseHeader;
 import com.weweibuy.pay.wx.config.properties.WxAppProperties;
 import com.weweibuy.pay.wx.model.constant.WxApiConstant;
+import com.weweibuy.pay.wx.model.vo.H5JsSdkSignVO;
 import feign.Request;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.cglib.beans.BeanMap;
 
@@ -25,6 +28,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
@@ -203,6 +207,19 @@ public final class SignAndVerifySignUtils {
         }
     }
 
-
+    /**
+     * JS SDK 签名
+     *
+     * @param h5JsSdkSignVO
+     * @return
+     */
+    public static String jsSdkSing(H5JsSdkSignVO h5JsSdkSignVO) {
+        String json = JackJsonUtils.writeSnakeCase(h5JsSdkSignVO);
+        TreeMap<String, Object> treeMap = JackJsonUtils.readSnakeCaseValue(json, TreeMap.class);
+        String str = treeMap.entrySet().stream()
+                .map(e -> e.getKey() + "=" + e.getValue())
+                .collect(Collectors.joining("&"));
+        return DigestUtils.sha1Hex(str);
+    }
 
 }
