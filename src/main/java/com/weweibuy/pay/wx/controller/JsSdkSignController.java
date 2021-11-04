@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2021/11/3 21:55
  **/
 @RestController
-@RequestMapping("/wx/js-sdk")
+@RequestMapping("/wx/h5/js-sdk")
 @RequiredArgsConstructor
 public class JsSdkSignController {
 

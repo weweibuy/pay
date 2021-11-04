@@ -2,7 +2,7 @@ package com.weweibuy.pay.wx.utils;
 
 import com.weweibuy.framework.common.core.exception.Exceptions;
 import com.weweibuy.framework.common.core.utils.JackJsonUtils;
-import com.weweibuy.pay.wx.client.dto.req.WxRequestAuthorizationHeader;
+import com.weweibuy.pay.wx.client.dto.req.RequestAuthorizationHeader;
 import com.weweibuy.pay.wx.client.dto.req.WxRequestSign;
 import com.weweibuy.pay.wx.client.dto.resp.WxResponseHeader;
 import com.weweibuy.pay.wx.config.properties.WxAppProperties;
@@ -69,7 +69,7 @@ public final class SignAndVerifySignUtils {
      */
     public static String signAndToken(Request request, WxAppProperties appProperties) throws SignatureException, InvalidKeyException {
         WxRequestSign wxRequestSign = WxRequestSign.wxRequestSign(request);
-        WxRequestAuthorizationHeader authorizationHeader = WxRequestAuthorizationHeader.authorizationHeader(wxRequestSign, appProperties);
+        RequestAuthorizationHeader authorizationHeader = RequestAuthorizationHeader.authorizationHeader(wxRequestSign, appProperties);
         Map<Object, Object> map = BeanMap.create(authorizationHeader);
         return map.entrySet().stream()
                 .map(e -> String.format(SIGN_FIELD_FORMAT, e.getKey(), e.getValue()))

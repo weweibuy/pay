@@ -2,6 +2,7 @@ package com.weweibuy.pay.wx.client;
 
 import com.weweibuy.pay.wx.client.dto.resp.GzhAccessTokenRespDTO;
 import com.weweibuy.pay.wx.client.dto.resp.H5JsapiTicketRespDTO;
+import com.weweibuy.pay.wx.config.WxFeignSnakeCaseEncoderAndDecoder;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @date 2021/11/3 23:06
  **/
 @FeignClient(name = "jsSdkSignClient", contextId = "jsSdkSignClient",
-        url = "https://api.weixin.qq.com/cgi-bin")
+        url = "https://api.weixin.qq.com/cgi-bin", configuration = WxFeignSnakeCaseEncoderAndDecoder.class)
 public interface JsSdkSignClient {
 
 

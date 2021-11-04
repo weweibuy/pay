@@ -15,7 +15,7 @@ import java.security.SignatureException;
  **/
 @Data
 @Builder
-public class WxRequestAuthorizationHeader {
+public class RequestAuthorizationHeader {
 
     /**
      * 商户号
@@ -43,9 +43,9 @@ public class WxRequestAuthorizationHeader {
     private String serial_no;
 
 
-    public static WxRequestAuthorizationHeader authorizationHeader(WxRequestSign requestSign, WxAppProperties wxAppProperties) throws SignatureException, InvalidKeyException {
+    public static RequestAuthorizationHeader authorizationHeader(WxRequestSign requestSign, WxAppProperties wxAppProperties) throws SignatureException, InvalidKeyException {
         WxAppProperties.SerialNoPrivateKey serialNoPrivateKey = wxAppProperties.getPrivateKey().get(0);
-        return WxRequestAuthorizationHeader.builder()
+        return RequestAuthorizationHeader.builder()
                 .mchid(wxAppProperties.getMerchantId())
                 .nonce_str(requestSign.getNonce())
                 // 签名
